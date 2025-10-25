@@ -1,5 +1,7 @@
+# This workflow is named "CI workflow"
 name: CI workflow
 
+# It triggers on push or pull_request events targeting the 'main' branch
 on:
   push:
     branches: [ "main" ]
@@ -7,19 +9,30 @@ on:
     branches: [ "main" ]
 
 jobs:
+  # The "build" job will run the CI steps
   build:
+    # It runs on the latest Ubuntu runner
     runs-on: ubuntu-latest
+    # It uses a Python 3.9 slim container for all steps
     container: python:3.9-slim
+
     steps:
+      # Step 1: Check out the repository code
       - name: Checkout
         uses: actions/checkout@v3
+
+      # Step 2: Install Python dependencies
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
+      
+      # Step 3: Lint code with flake8
       - name: Lint with flake8
         run: |
           flake8 service --count --select=E9,F63,F7,F82 --show-source --statistics
           flake8 service --count --max-complexity=10 --max-line-length=127 --statistics
+      
+      # Step 4: Run unit tests with nose
       - name: Run unit tests with nose
         run: nosetests -v --with-spec --spec-color --with-coverage --cover-package=app
